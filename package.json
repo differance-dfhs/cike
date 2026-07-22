@@ -48,6 +48,8 @@
   },
   "devDependencies": {
     "@electron/asar": "^3.4.1",
+    "@emnapi/core": "^1.11.2",
+    "@emnapi/runtime": "^1.11.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^6.0.3",
@@ -100,7 +102,7 @@
       ],
       "extendInfo": {
         "LSUIElement": true,
-      "NSDocumentsFolderUsageDescription": "此刻仅访问您明确选择的项目目录，用于理解进度，并在识别到明确任务时由 Codex 完成必要改动。"
+        "NSDocumentsFolderUsageDescription": "此刻仅访问您明确选择的项目目录，用于理解进度，并在识别到明确任务时由 Codex 完成必要改动。"
       }
     },
     "dmg": {
