@@ -1,0 +1,133 @@
+{
+  "name": "cike-proactive-agent",
+  "version": "0.6.0",
+  "description": "A privacy-first proactive layer for Codex, delivered through a macOS Dynamic Island.",
+  "author": "Cike Contributors",
+  "license": "MIT",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/differance-dfhs/cike.git"
+  },
+  "homepage": "https://github.com/differance-dfhs/cike#readme",
+  "bugs": {
+    "url": "https://github.com/differance-dfhs/cike/issues"
+  },
+  "keywords": [
+    "codex",
+    "proactive-agent",
+    "macos",
+    "dynamic-island",
+    "productivity"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "electron/main.mjs",
+  "scripts": {
+    "dev": "concurrently -k -n ui,desktop -c cyan,magenta \"vite --host 127.0.0.1 --port 5189\" \"wait-on tcp:5189 && VITE_DEV_SERVER_URL=http://127.0.0.1:5189 electron .\"",
+    "dev:web": "concurrently -k -n service,ui -c yellow,cyan \"node server/index.mjs\" \"vite --host 127.0.0.1 --port 5189\"",
+    "build": "tsc -b && vite build",
+    "start": "electron .",
+    "serve": "node server/index.mjs",
+    "preview": "vite preview --host 127.0.0.1 --port 5189",
+    "typecheck": "tsc -b --pretty false",
+    "test": "node --test electron/*.test.mjs server/**/*.test.mjs src/*.test.mjs",
+    "audit:public": "node scripts/audit-public-source.mjs",
+    "clean:release": "node scripts/clean-release.mjs",
+    "pack:mac": "npm run build && electron-builder --mac --universal --dir",
+    "dist:mac": "npm run build && electron-builder --mac --universal",
+    "dist:mac:unsigned": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --universal --dir && node scripts/finalize-mac-app.mjs && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg --universal --prepackaged 'release/mac-universal/此刻.app' && node scripts/prepare-clean-distribution.mjs",
+    "dist:mac:clean": "npm run clean:release && npm run typecheck && npm test && npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --universal --dir && node scripts/finalize-mac-app.mjs && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg --universal --prepackaged 'release/mac-universal/此刻.app' && node scripts/prepare-clean-distribution.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@electron/asar": "^3.4.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^6.0.3",
+    "concurrently": "^9.1.0",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
+    "typescript": "^5.6.3",
+    "vite": "^8.1.5",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "app.cike.desktop",
+    "productName": "此刻",
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "asar": true,
+    "compression": "maximum",
+    "npmRebuild": false,
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/*.mjs",
+      "electron/preload.cjs",
+      "server/**/*.mjs",
+      "package.json",
+      "!electron/*.test.mjs",
+      "!server/**/*.test.mjs",
+      "!**/*.map",
+      "!.data{,/**/*}",
+      "!output{,/**/*}",
+      "!qa{,/**/*}",
+      "!src{,/**/*}",
+      "!.playwright-cli{,/**/*}"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.inherit.plist",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "extendInfo": {
+        "LSUIElement": true,
+      "NSDocumentsFolderUsageDescription": "此刻仅访问您明确选择的项目目录，用于理解进度，并在识别到明确任务时由 Codex 完成必要改动。"
+      }
+    },
+    "dmg": {
+      "title": "此刻 ${version}",
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 150,
+          "y": 180,
+          "type": "file"
+        },
+        {
+          "x": 390,
+          "y": 180,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 270,
+          "y": 310,
+          "type": "file",
+          "path": "INSTALL.md"
+        }
+      ]
+    }
+  }
+}

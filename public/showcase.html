@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>此刻 · Synthetic product preview</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+      body {
+        display: grid;
+        place-items: center;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+        color: #f4f8fb;
+        background:
+          radial-gradient(circle at 15% 20%, rgba(61, 112, 232, .34), transparent 32%),
+          radial-gradient(circle at 84% 78%, rgba(45, 177, 167, .24), transparent 34%),
+          linear-gradient(135deg, #07101b 0%, #0c1a2b 52%, #071018 100%);
+      }
+      .grain {
+        position: fixed; inset: 0; pointer-events: none; opacity: .13;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      }
+      main { width: min(1120px, calc(100vw - 96px)); display: grid; grid-template-columns: 1fr 480px; gap: 72px; align-items: center; }
+      .copy { align-self: center; }
+      .eyebrow { display: flex; align-items: center; gap: 10px; color: #70ddd0; font-size: 14px; font-weight: 700; letter-spacing: .08em; }
+      .eyebrow i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 18px currentColor; }
+      h1 { max-width: 520px; margin: 22px 0 18px; font-family: "Source Han Serif SC", "Songti SC", serif; font-size: 52px; line-height: 1.12; letter-spacing: -.035em; }
+      p { max-width: 500px; margin: 0; color: rgba(232, 241, 247, .66); font-size: 18px; line-height: 1.72; }
+      .meta { display: flex; gap: 20px; margin-top: 34px; color: rgba(232, 241, 247, .48); font-size: 13px; }
+      .stage { position: relative; width: 480px; min-height: 620px; display: flex; align-items: flex-start; justify-content: center; padding-top: 12px; }
+      .stage::before { content: ""; position: absolute; inset: -42px -32px; border: 1px solid rgba(255,255,255,.08); border-radius: 42px; background: rgba(255,255,255,.025); box-shadow: inset 0 1px rgba(255,255,255,.07), 0 42px 90px rgba(0,0,0,.34); backdrop-filter: blur(26px); }
+      iframe { position: relative; width: 472px; height: 610px; border: 0; background: transparent; }
+      body[data-mode="dormant"] main { grid-template-columns: 1fr; }
+      body[data-mode="dormant"] .copy { text-align: center; justify-self: center; }
+      body[data-mode="dormant"] .copy p { margin-inline: auto; }
+      body[data-mode="dormant"] .meta { justify-content: center; }
+      body[data-mode="dormant"] .stage { width: 760px; min-height: 110px; margin: 36px auto 0; padding-top: 0; }
+      body[data-mode="dormant"] .stage::before { inset: -26px -32px; border-radius: 36px; }
+      body[data-mode="dormant"] iframe { width: 720px; height: 40px; }
+      body[data-mode="dormant"] main { display: block; }
+    </style>
+  </head>
+  <body>
+    <div class="grain"></div>
+    <main>
+      <section class="copy">
+        <div class="eyebrow"><i></i><span>CIKE · LOCAL-FIRST PROACTIVE AGENT</span></div>
+        <h1 id="title">该你决定时，才出现。</h1>
+        <p id="description">此刻理解你的工作节奏，过滤噪声，并把 Codex 的结果压缩成一个可以直接行动的界面。</p>
+        <div class="meta"><span>macOS</span><span>Codex powered</span><span>100% synthetic demo data</span></div>
+      </section>
+      <section class="stage"><iframe id="island" title="此刻灵动岛演示"></iframe></section>
+    </main>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const scenario = params.get('scenario') || 'result';
+      const mode = params.get('mode') || 'suggestion';
+      document.body.dataset.mode = mode;
+      const copy = {
+        result: ['工作结果，就在此刻。', 'Codex 完成任务后，不用跳进另一个工具：结论、产物和下一步会一起出现在灵动岛。'],
+        decision: ['建议不是通知，是判断。', '按钮数量由内容决定。该追问、采用、延期还是交给 Codex，模型会为当前情境生成恰当选项。'],
+        progress: ['后台在做什么，一眼就懂。', '执行中的任务保持轻量可见；需要你介入时，才展开完整上下文。'],
+        dormant: ['不打扰，也不消失。', '没有值得介入的事时，此刻会收回摄像头区域，只留下宠物和必要的状态。'],
+      };
+      const selected = mode === 'dormant' ? copy.dormant : (copy[scenario] || copy.result);
+      document.querySelector('#title').textContent = selected[0];
+      document.querySelector('#description').textContent = selected[1];
+      document.querySelector('#island').src = `/?view=${encodeURIComponent(mode)}&demo=${encodeURIComponent(scenario)}`;
+    </script>
+  </body>
+</html>
