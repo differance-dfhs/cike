@@ -12,6 +12,7 @@ import { CodexRunner } from './codex-runner.mjs';
 import { DeliveryCoordinator } from './delivery-coordinator.mjs';
 import { DeliveryRegistry } from './delivery-registry.mjs';
 import { ProactiveEngine } from './engine.mjs';
+import { FiveLayerMemoryStore } from './five-layer-memory.mjs';
 import { createHttpService } from './http-service.mjs';
 import { JsonStateStore } from './state-store.mjs';
 import { UserLearningStore } from './user-learning.mjs';
@@ -116,6 +117,11 @@ export async function createService(options = {}) {
     profilePath: options.profilePath,
     deferProfileLoad: options.deferProfileLoad !== false,
   });
+  const memory = options.memory || new FiveLayerMemoryStore(dataDir, {
+    now,
+    homeDir: options.homeDir,
+    sources: options.memorySources,
+  });
   const local = options.local || new LocalAdapter({ now, roots: projectRoots });
   traceStartup('local-adapter-ready');
   const activity = options.activity || (contextSourcesEnabled
@@ -174,6 +180,7 @@ export async function createService(options = {}) {
       deliveryRegistry,
       store,
       learning,
+      memory,
       now,
       autoExecute: options.autoExecute,
       contextSourcesEnabled,
@@ -197,6 +204,7 @@ export async function createService(options = {}) {
     deliveryCoordinator,
     larkPublisher,
     learning,
+    memory,
     dataDir,
   });
   return httpService;

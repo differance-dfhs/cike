@@ -13,5 +13,7 @@ Open a minimal GitHub security advisory with reproducible steps and synthetic da
 - Workspace changes require an explicitly configured, validated local root.
 - Symlinks, traversal paths, credential-shaped content and untrusted remote writes fail closed.
 - External sends, publishing and destructive actions are outside the default autonomous boundary.
+- Five-layer memory, imported profiles, feedback and task state stay in the current user's application data directory with private permissions. The renderer receives counts and status, never raw memory entries.
+- User memory and source fingerprints are excluded from Git and application packaging.
 
 This preview is not Apple-notarized. Verify release checksums before installation.

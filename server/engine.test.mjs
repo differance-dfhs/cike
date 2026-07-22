@@ -120,6 +120,22 @@ class FakeLearning {
   }
 }
 
+class FakeFiveLayerMemory {
+  async init() {}
+  async syncPrivateSources() { return { changed: false }; }
+  async replaceLiveEntries() { return 0; }
+  promptContext({ projectKey }) {
+    return `<CIKE_PRIVATE_MEMORY>\n- [项目上下文记忆] Synthetic context：only for ${projectKey}\n</CIKE_PRIVATE_MEMORY>`;
+  }
+  publicSummary() {
+    return {
+      state: 'ready', updatedAt: '2026-07-17T07:40:00.000Z', sourceCount: 1, totalEntries: 1,
+      privacy: 'local only',
+      layers: [{ id: 'project', label: '项目上下文记忆', purpose: 'synthetic', count: 1 }],
+    };
+  }
+}
+
 function adapter(value) {
   return { collect: async () => structuredClone(value) };
 }
@@ -716,6 +732,7 @@ function engineForMention({
   publishLarkDocuments,
   deliverySources,
   learning,
+  memory,
 } = {}) {
   return new ProactiveEngine({
     now,
@@ -758,6 +775,7 @@ function engineForMention({
           },
         ),
     ...(learning ? { learning } : {}),
+    ...(memory ? { memory } : {}),
     ...(activity ? { activity: typeof activity?.collect === 'function' ? activity : adapter(activity) } : {}),
   });
 }
@@ -788,6 +806,7 @@ test('普通会后本人任务也会静默交给 Codex，并由通用结果交�
   const engine = engineForMention({
     now: () => new Date(clock),
     runner,
+    memory: new FakeFiveLayerMemory(),
     autoExecute: true,
     chronicle: {
       classification: 'meeting',
@@ -844,6 +863,10 @@ test('普通会后本人任务也会静默交给 Codex，并由通用结果交�
   assert.equal(runner.calls[0].workspacePath, '/Users/example/Documents/客户支持');
   assert.match(runner.calls[0].prompt, /受信任本地工作区/u);
   assert.match(runner.calls[0].prompt, /最小本地编辑|最小必要改动/u);
+  assert.match(runner.calls[0].prompt, /CIKE_PRIVATE_MEMORY/u);
+  assert.match(runner.calls[0].prompt, /only for 客户支持/u);
+  assert.equal(snapshot.memory.totalEntries, 1);
+  assert.doesNotMatch(JSON.stringify(snapshot.memory), /Synthetic context/u);
   assert.equal(snapshot.now.state, 'meeting');
 
   await engine.getSnapshot({ force: true, reason: 'background' });
