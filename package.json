@@ -1,6 +1,6 @@
 {
   "name": "cike-proactive-agent",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "A privacy-first proactive layer for Codex, delivered through a macOS Dynamic Island.",
   "author": "Cike Contributors",
   "license": "MIT",
@@ -35,6 +35,7 @@
     "typecheck": "tsc -b --pretty false",
     "test": "node --test electron/*.test.mjs server/**/*.test.mjs src/*.test.mjs",
     "audit:public": "node scripts/audit-public-source.mjs",
+    "memory:sync": "node scripts/sync-private-memory.mjs",
     "clean:release": "node scripts/clean-release.mjs",
     "pack:mac": "npm run build && electron-builder --mac --universal --dir",
     "dist:mac": "npm run build && electron-builder --mac --universal",

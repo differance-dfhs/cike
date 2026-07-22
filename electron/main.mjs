@@ -692,6 +692,7 @@ function installTray() {
   tray = new Tray(trayImage());
   tray.setToolTip('此刻 - Codex 主动助手');
   tray.on('click', toggleDrawer);
+  const memorySummary = service?.memory?.publicSummary?.();
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: '展开 / 折叠', click: toggleDrawer },
@@ -729,6 +730,16 @@ function installTray() {
               click: (menuItem) => { void setPublishLarkDocumentsEnabled(menuItem.checked); },
             },
           ]
+        : []),
+      ...(memorySummary?.state === 'ready'
+        ? [{
+            label: `五层记忆 · ${memorySummary.totalEntries} 条`,
+            submenu: [
+              ...memorySummary.layers.map((layer) => ({ label: `${layer.label}  ${layer.count}`, enabled: false })),
+              { type: 'separator' },
+              { label: '仅保存在本机', enabled: false },
+            ],
+          }]
         : []),
       { type: 'separator' },
       { label: '退出', click: () => app.quit() },

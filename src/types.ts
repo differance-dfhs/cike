@@ -374,6 +374,19 @@ export interface AgentSnapshot {
     correctionCandidates: string[];
     updatedAt: string | null;
   };
+  memory?: {
+    state: 'ready' | 'empty';
+    updatedAt: string | null;
+    sourceCount: number;
+    totalEntries: number;
+    privacy: string;
+    layers: Array<{
+      id: 'working' | 'project' | 'preference' | 'expertise' | 'long_term';
+      label: string;
+      purpose: string;
+      count: number;
+    }>;
+  };
   codexRuntime?: {
     state: 'running' | 'complete' | 'idle' | 'unavailable';
     current: CodexRuntimeSession | null;
